@@ -1,0 +1,218 @@
+-- BRAIN v5.0 | Illunox
+-- Host this on Pastebin/GitHub raw
+
+local _T = {}
+local _N = {}
+
+local function _D(t)
+    local c = _T[t]
+    if not c then return t end
+    local r = ""
+    for i = 1, #c do r = r .. string.char(c[i]) end
+    return r
+end
+
+local function _N2(t)
+    return _N[t]
+end
+
+local _lp = game:GetService("Players").LocalPlayer
+
+local function _RUN(code)
+    local env = setmetatable({
+
+        -- ── Brain decoders ────────────────────────────────
+        _D=_D, _N2=_N2,
+
+        -- ── Lua stdlib ────────────────────────────────────
+        print=print, warn=warn, error=error, assert=assert,
+        tostring=tostring, tonumber=tonumber, type=type,
+        pairs=pairs, ipairs=ipairs, next=next, select=select,
+        unpack=unpack or table.unpack,
+        pcall=pcall, xpcall=xpcall,
+        loadstring=loadstring, require=require,
+        rawget=rawget, rawset=rawset, rawequal=rawequal,
+        setmetatable=setmetatable, getmetatable=getmetatable,
+        math=math, table=table, string=string,
+        os=os, io=io, coroutine=coroutine, bit32=bit32,
+
+        -- ── Roblox core ───────────────────────────────────
+        game=game, workspace=workspace, script=script,
+        wait=wait, delay=delay, spawn=spawn, tick=tick,
+        shared=shared, _G=_G,
+
+        -- ── task library (full) ───────────────────────────
+        task=task,
+
+        -- ── Roblox types ──────────────────────────────────
+        Instance=Instance, Enum=Enum,
+        Vector3=Vector3, Vector2=Vector2,
+        Vector3int16=Vector3int16, Vector2int16=Vector2int16,
+        CFrame=CFrame, Color3=Color3,
+        UDim=UDim, UDim2=UDim2,
+        Ray=Ray, Rect=Rect,
+        TweenInfo=TweenInfo, BrickColor=BrickColor,
+        NumberSequence=NumberSequence,
+        NumberSequenceKeypoint=NumberSequenceKeypoint,
+        ColorSequence=ColorSequence,
+        ColorSequenceKeypoint=ColorSequenceKeypoint,
+        NumberRange=NumberRange,
+        PhysicalProperties=PhysicalProperties,
+        Region3=Region3, Region3int16=Region3int16,
+        Axes=Axes, Faces=Faces,
+        RaycastParams=RaycastParams,
+        OverlapParams=OverlapParams,
+        PathWaypoint=PathWaypoint,
+        Random=Random,
+
+        -- ── All Services ──────────────────────────────────
+        Players                 = game:GetService("Players"),
+        RunService              = game:GetService("RunService"),
+        UserInputService        = game:GetService("UserInputService"),
+        TweenService            = game:GetService("TweenService"),
+        HttpService             = game:GetService("HttpService"),
+        ReplicatedStorage       = game:GetService("ReplicatedStorage"),
+        ServerStorage           = pcall(function() return game:GetService("ServerStorage") end) and game:GetService("ServerStorage") or nil,
+        ServerScriptService     = pcall(function() return game:GetService("ServerScriptService") end) and game:GetService("ServerScriptService") or nil,
+        Workspace               = game:GetService("Workspace"),
+        Lighting                = game:GetService("Lighting"),
+        StarterGui              = game:GetService("StarterGui"),
+        StarterPack             = game:GetService("StarterPack"),
+        StarterPlayer           = game:GetService("StarterPlayer"),
+        SoundService            = game:GetService("SoundService"),
+        CollectionService       = game:GetService("CollectionService"),
+        PathfindingService      = game:GetService("PathfindingService"),
+        ContextActionService    = game:GetService("ContextActionService"),
+        MarketplaceService      = game:GetService("MarketplaceService"),
+        LocalizationService     = game:GetService("LocalizationService"),
+        TextService             = game:GetService("TextService"),
+        GuiService              = game:GetService("GuiService"),
+        VirtualInputManager     = game:GetService("VirtualInputManager"),
+        VirtualUser             = game:GetService("VirtualUser"),
+        PhysicsService          = game:GetService("PhysicsService"),
+        TeamService             = game:GetService("TeamService"),
+        BadgeService            = game:GetService("BadgeService"),
+        InsertService           = game:GetService("InsertService"),
+        DataStoreService        = pcall(function() return game:GetService("DataStoreService") end) and game:GetService("DataStoreService") or nil,
+        MemoryStoreService      = pcall(function() return game:GetService("MemoryStoreService") end) and game:GetService("MemoryStoreService") or nil,
+        MessagingService        = pcall(function() return game:GetService("MessagingService") end) and game:GetService("MessagingService") or nil,
+        GroupService            = game:GetService("GroupService"),
+        TeleportService         = game:GetService("TeleportService"),
+        Chat                    = game:GetService("Chat"),
+        CoreGui                 = game:GetService("CoreGui"),
+        AnimationProvider       = game:GetService("AnimationProvider"),
+        ProximityPromptService  = game:GetService("ProximityPromptService"),
+        KeyframeSequenceProvider= game:GetService("KeyframeSequenceProvider"),
+        AssetService            = game:GetService("AssetService"),
+        AvatarEditorService     = game:GetService("AvatarEditorService"),
+
+        -- ── LocalPlayer shortcuts ─────────────────────────
+        LocalPlayer     = _lp,
+        PlayerGui       = _lp and _lp:WaitForChild("PlayerGui") or nil,
+        Backpack         = _lp and _lp:WaitForChild("Backpack") or nil,
+        Character        = _lp and _lp.Character or nil,
+        Camera           = workspace.CurrentCamera,
+
+        -- ── Remote helpers ────────────────────────────────
+        FireRemote = function(path, ...)
+            local obj = game
+            for part in path:gmatch("[^%.]+") do obj = obj:WaitForChild(part) end
+            if obj and obj.FireServer then obj:FireServer(...) end
+        end,
+        InvokeRemote = function(path, ...)
+            local obj = game
+            for part in path:gmatch("[^%.]+") do obj = obj:WaitForChild(part) end
+            if obj and obj.InvokeServer then return obj:InvokeServer(...) end
+        end,
+        GetRemote = function(path)
+            local obj = game
+            for part in path:gmatch("[^%.]+") do obj = obj:WaitForChild(part) end
+            return obj
+        end,
+
+        -- ── Tween helper ──────────────────────────────────
+        Tween = function(obj, t, props)
+            game:GetService("TweenService"):Create(obj, TweenInfo.new(t or 0.3), props):Play()
+        end,
+
+        -- ── GUI builder helper ────────────────────────────
+        NewGui = function(class, parent, props)
+            local obj = Instance.new(class)
+            if props then for k,v in pairs(props) do obj[k]=v end end
+            obj.Parent = parent
+            return obj
+        end,
+
+        -- ── Exploit: file system ──────────────────────────
+        writefile=writefile, readfile=readfile,
+        isfile=isfile, isfolder=isfolder,
+        makefolder=makefolder, delfolder=delfolder,
+        delfile=delfile, listfiles=listfiles,
+        appendfile=appendfile,
+
+        -- ── Exploit: clipboard ────────────────────────────
+        setclipboard=setclipboard,
+        toclipboard=toclipboard,
+
+        -- ── Exploit: input / touch ────────────────────────
+        firetouchinterest=firetouchinterest,
+        fireclickdetector=fireclickdetector,
+        fireproximityprompt=fireproximityprompt,
+        firetouchtransmitter=firetouchtransmitter,
+
+        -- ── Exploit: http ─────────────────────────────────
+        request=request,
+        syn=syn, http=http, fluxus=fluxus,
+        HttpGet=HttpGet, HttpPost=HttpPost,
+
+        -- ── Exploit: metatable / hooks ────────────────────
+        getgenv=getgenv, getrenv=getrenv,
+        getrawmetatable=getrawmetatable,
+        setrawmetatable=setrawmetatable,
+        hookfunction=hookfunction,
+        hookmetamethod=hookmetamethod,
+        newcclosure=newcclosure,
+        checkcaller=checkcaller,
+        islclosure=islclosure,
+
+        -- ── Exploit: script / gc ──────────────────────────
+        getgc=getgc,
+        getsenv=getsenv,
+        getscripts=getscripts,
+        getloadedmodules=getloadedmodules,
+        decompile=decompile,
+
+        -- ── Exploit: signals ─────────────────────────────
+        getconnections=getconnections,
+        firesignal=firesignal,
+
+        -- ── Exploit: drawing ─────────────────────────────
+        Drawing=Drawing,
+        cleardrawcache=cleardrawcache,
+
+        -- ── Exploit: misc ─────────────────────────────────
+        identifyexecutor=identifyexecutor,
+        getexecutorname=getexecutorname,
+        messagebox=messagebox,
+        queue_on_teleport=queue_on_teleport,
+        setfflag=setfflag,
+
+    }, {__index = _G})
+
+    local fn, err = loadstring(code)
+    if not fn then warn("[Brain] Compile: "..tostring(err)) return end
+    setfenv(fn, env)
+    local ok, e = pcall(fn)
+    if not ok then warn("[Brain] Runtime: "..tostring(e)) end
+end
+
+local function _LOAD(token_table, num_table, chunks)
+    _T = token_table
+    _N = num_table or {}
+    for i = 1, #chunks do
+        local ok, e = pcall(_RUN, chunks[i])
+        if not ok then warn("[Brain] chunk "..i..": "..tostring(e)) end
+    end
+end
+
+return _LOAD
