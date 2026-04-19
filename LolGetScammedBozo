@@ -1,4 +1,4 @@
--- BRAIN v6.0 | Illunox
+-- BRAIN v6.1 | Illunox
 
 local _T = {}
 local _N = {}
@@ -15,9 +15,14 @@ local function _N2(t)
     return _N[t]
 end
 
--- Safe get: returns nil instead of erroring if global doesnt exist
 local function _safe(name)
     return rawget(_G, name)
+end
+
+local function _svc(name)
+    local ok, result = pcall(function() return game:GetService(name) end)
+    if ok then return result end
+    return nil
 end
 
 local _lp = game:GetService("Players").LocalPlayer
@@ -44,8 +49,6 @@ local function _RUN(code)
         -- Roblox types
         Instance=Instance, Enum=Enum,
         Vector3=Vector3, Vector2=Vector2,
-        Vector3int16=_safe("Vector3int16"),
-        Vector2int16=_safe("Vector2int16"),
         CFrame=CFrame, Color3=Color3,
         UDim=UDim, UDim2=UDim2,
         Ray=Ray, Rect=Rect,
@@ -57,50 +60,50 @@ local function _RUN(code)
         NumberRange=NumberRange,
         PhysicalProperties=_safe("PhysicalProperties"),
         Region3=_safe("Region3"),
-        Region3int16=_safe("Region3int16"),
         Axes=_safe("Axes"), Faces=_safe("Faces"),
         RaycastParams=_safe("RaycastParams"),
         OverlapParams=_safe("OverlapParams"),
         PathWaypoint=_safe("PathWaypoint"),
         Random=_safe("Random"),
-        -- Services
-        Players                 = game:GetService("Players"),
-        RunService              = game:GetService("RunService"),
-        UserInputService        = game:GetService("UserInputService"),
-        TweenService            = game:GetService("TweenService"),
-        HttpService             = game:GetService("HttpService"),
-        ReplicatedStorage       = game:GetService("ReplicatedStorage"),
-        Workspace               = game:GetService("Workspace"),
-        Lighting                = game:GetService("Lighting"),
-        StarterGui              = game:GetService("StarterGui"),
-        StarterPack             = game:GetService("StarterPack"),
-        StarterPlayer           = game:GetService("StarterPlayer"),
-        SoundService            = game:GetService("SoundService"),
-        CollectionService       = game:GetService("CollectionService"),
-        PathfindingService      = game:GetService("PathfindingService"),
-        ContextActionService    = game:GetService("ContextActionService"),
-        MarketplaceService      = game:GetService("MarketplaceService"),
-        LocalizationService     = game:GetService("LocalizationService"),
-        TextService             = game:GetService("TextService"),
-        GuiService              = game:GetService("GuiService"),
-        VirtualInputManager     = game:GetService("VirtualInputManager"),
-        VirtualUser             = game:GetService("VirtualUser"),
-        PhysicsService          = game:GetService("PhysicsService"),
-        TeamService             = game:GetService("TeamService"),
-        BadgeService            = game:GetService("BadgeService"),
-        InsertService           = game:GetService("InsertService"),
-        GroupService            = game:GetService("GroupService"),
-        TeleportService         = game:GetService("TeleportService"),
-        Chat                    = game:GetService("Chat"),
-        CoreGui                 = game:GetService("CoreGui"),
-        ProximityPromptService  = game:GetService("ProximityPromptService"),
-        -- LocalPlayer shortcuts
+        Vector3int16=_safe("Vector3int16"),
+        Vector2int16=_safe("Vector2int16"),
+        -- Services (all via _svc so bad names never crash)
+        Players                = _svc("Players"),
+        RunService             = _svc("RunService"),
+        UserInputService       = _svc("UserInputService"),
+        TweenService           = _svc("TweenService"),
+        HttpService            = _svc("HttpService"),
+        ReplicatedStorage      = _svc("ReplicatedStorage"),
+        Workspace              = _svc("Workspace"),
+        Lighting               = _svc("Lighting"),
+        StarterGui             = _svc("StarterGui"),
+        StarterPack            = _svc("StarterPack"),
+        StarterPlayer          = _svc("StarterPlayer"),
+        SoundService           = _svc("SoundService"),
+        CollectionService      = _svc("CollectionService"),
+        PathfindingService     = _svc("PathfindingService"),
+        ContextActionService   = _svc("ContextActionService"),
+        MarketplaceService     = _svc("MarketplaceService"),
+        LocalizationService    = _svc("LocalizationService"),
+        TextService            = _svc("TextService"),
+        GuiService             = _svc("GuiService"),
+        VirtualInputManager    = _svc("VirtualInputManager"),
+        VirtualUser            = _svc("VirtualUser"),
+        PhysicsService         = _svc("PhysicsService"),
+        BadgeService           = _svc("BadgeService"),
+        InsertService          = _svc("InsertService"),
+        GroupService           = _svc("GroupService"),
+        TeleportService        = _svc("TeleportService"),
+        Chat                   = _svc("Chat"),
+        CoreGui                = _svc("CoreGui"),
+        ProximityPromptService = _svc("ProximityPromptService"),
+        -- LocalPlayer
         LocalPlayer = _lp,
         PlayerGui   = _lp and _lp:WaitForChild("PlayerGui") or nil,
-        Backpack     = _lp and _lp:WaitForChild("Backpack") or nil,
-        Character    = _lp and _lp.Character or nil,
-        Camera       = workspace.CurrentCamera,
-        -- Remote helpers
+        Backpack    = _lp and _lp:WaitForChild("Backpack") or nil,
+        Character   = _lp and _lp.Character or nil,
+        Camera      = workspace.CurrentCamera,
+        -- Helpers
         FireRemote = function(path, ...)
             local obj = game
             for part in path:gmatch("[^%.]+") do obj = obj:WaitForChild(part) end
@@ -125,7 +128,7 @@ local function _RUN(code)
             obj.Parent = parent
             return obj
         end,
-        -- Exploit globals via _safe so nil never crashes
+        -- Exploit globals (nil-safe)
         writefile=_safe("writefile"), readfile=_safe("readfile"),
         isfile=_safe("isfile"), isfolder=_safe("isfolder"),
         makefolder=_safe("makefolder"), delfolder=_safe("delfolder"),
