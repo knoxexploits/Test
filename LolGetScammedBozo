@@ -1,22 +1,22 @@
 local _T={}
 local _N={}
-local function _lIIlllIlI(t)
+local function wowDecode(t)
 local c=_T[t]
 if not c then return t end
 local r=""
 for i=1,#c do r=r..string.char(c[i])end
 return r
 end
-local function _IlIllIIlI(t)
+local function niceNumber(t)
 local v=_N[t]
 if v==nil then return 0 end
 return v
 end
-local function _LOAD(tk,nk,chunks)
+local function load(tk,nk,chunks)
 _T=tk
 _N=nk or{}
-rawset(_G,"_lIIlllIlI",_lIIlllIlI)
-rawset(_G,"_IlIllIIlI",_IlIllIIlI)
+rawset(_G,"wowDecode",wowDecode)
+rawset(_G,"niceNumber",niceNumber)
 for i=1,#chunks do
 local ok,e=pcall(function()
 local fn,err=loadstring(chunks[i])
@@ -26,4 +26,4 @@ end)
 if not ok then warn("[E]"..tostring(e))end
 end
 end
-return _LOAD
+return load
