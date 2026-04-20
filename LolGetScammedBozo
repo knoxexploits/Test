@@ -1,29 +1,27 @@
-local _T={}
-local _N={}
-local function wowDecode(t)
-local c=_T[t]
-if not c then return t end
-local r=""
-for i=1,#c do r=r..string.char(c[i])end
-return r
+-- BRAIN | Illunox
+-- This is the runtime that decodes and runs your scripts
+
+local function load(tk, nk, chunks)
+    for i = 1, #chunks do
+        local ok, e = pcall(function()
+            -- Build the decoder functions fresh for each chunk
+            -- using the token tables passed from loader
+            local env_T = tk
+            local env_N = nk or {}
+
+            -- Inject decoders into the chunk's environment via upvalues
+            -- The chunk already has them inlined so just run it
+            local fn, err = loadstring(chunks[i])
+            if not fn then
+                warn("[Brain] " .. tostring(err))
+                return
+            end
+            fn()
+        end)
+        if not ok then
+            warn("[Brain] " .. tostring(e))
+        end
+    end
 end
-local function niceNumber(t)
-local v=_N[t]
-if v==nil then return 0 end
-return v
-end
-local function load(tk,nk,chunks)
-_T=tk
-_N=nk or{}
-rawset(_G,"wowDecode",wowDecode)
-rawset(_G,"niceNumber",niceNumber)
-for i=1,#chunks do
-local ok,e=pcall(function()
-local fn,err=loadstring(chunks[i])
-if not fn then warn("[E]"..tostring(err))return end
-fn()
-end)
-if not ok then warn("[E]"..tostring(e))end
-end
-end
+
 return load
