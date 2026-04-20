@@ -1,186 +1,29 @@
--- BRAIN v6.1 | Illunox
-
-local _T = {}
-local _N = {}
-
-local function _D(t)
-    local c = _T[t]
-    if not c then return t end
-    local r = ""
-    for i = 1, #c do r = r .. string.char(c[i]) end
-    return r
+local _T={}
+local _N={}
+local function _lIIlllIlI(t)
+local c=_T[t]
+if not c then return t end
+local r=""
+for i=1,#c do r=r..string.char(c[i])end
+return r
 end
-
-local function _N2(t)
-    return _N[t]
+local function _IlIllIIlI(t)
+local v=_N[t]
+if v==nil then return 0 end
+return v
 end
-
-local function _safe(name)
-    return rawget(_G, name)
+local function _LOAD(tk,nk,chunks)
+_T=tk
+_N=nk or{}
+rawset(_G,"_lIIlllIlI",_lIIlllIlI)
+rawset(_G,"_IlIllIIlI",_IlIllIIlI)
+for i=1,#chunks do
+local ok,e=pcall(function()
+local fn,err=loadstring(chunks[i])
+if not fn then warn("[E]"..tostring(err))return end
+fn()
+end)
+if not ok then warn("[E]"..tostring(e))end
 end
-
-local function _svc(name)
-    local ok, result = pcall(function() return game:GetService(name) end)
-    if ok then return result end
-    return nil
 end
-
-local _lp = game:GetService("Players").LocalPlayer
-
-local function _RUN(code)
-    local env = setmetatable({
-        _D=_D, _N2=_N2,
-        -- Lua stdlib
-        print=print, warn=warn, error=error, assert=assert,
-        tostring=tostring, tonumber=tonumber, type=type,
-        pairs=pairs, ipairs=ipairs, next=next, select=select,
-        unpack=unpack or table.unpack,
-        pcall=pcall, xpcall=xpcall,
-        loadstring=loadstring, require=require,
-        rawget=rawget, rawset=rawset, rawequal=rawequal,
-        setmetatable=setmetatable, getmetatable=getmetatable,
-        math=math, table=table, string=string,
-        os=os, io=io, coroutine=coroutine,
-        bit32=_safe("bit32"),
-        -- Roblox core
-        game=game, workspace=workspace, script=script,
-        wait=wait, delay=delay, spawn=spawn, tick=tick,
-        task=task, shared=shared, _G=_G,
-        -- Roblox types
-        Instance=Instance, Enum=Enum,
-        Vector3=Vector3, Vector2=Vector2,
-        CFrame=CFrame, Color3=Color3,
-        UDim=UDim, UDim2=UDim2,
-        Ray=Ray, Rect=Rect,
-        TweenInfo=TweenInfo, BrickColor=BrickColor,
-        NumberSequence=NumberSequence,
-        NumberSequenceKeypoint=NumberSequenceKeypoint,
-        ColorSequence=ColorSequence,
-        ColorSequenceKeypoint=ColorSequenceKeypoint,
-        NumberRange=NumberRange,
-        PhysicalProperties=_safe("PhysicalProperties"),
-        Region3=_safe("Region3"),
-        Axes=_safe("Axes"), Faces=_safe("Faces"),
-        RaycastParams=_safe("RaycastParams"),
-        OverlapParams=_safe("OverlapParams"),
-        PathWaypoint=_safe("PathWaypoint"),
-        Random=_safe("Random"),
-        Vector3int16=_safe("Vector3int16"),
-        Vector2int16=_safe("Vector2int16"),
-        -- Services (all via _svc so bad names never crash)
-        Players                = _svc("Players"),
-        RunService             = _svc("RunService"),
-        UserInputService       = _svc("UserInputService"),
-        TweenService           = _svc("TweenService"),
-        HttpService            = _svc("HttpService"),
-        ReplicatedStorage      = _svc("ReplicatedStorage"),
-        Workspace              = _svc("Workspace"),
-        Lighting               = _svc("Lighting"),
-        StarterGui             = _svc("StarterGui"),
-        StarterPack            = _svc("StarterPack"),
-        StarterPlayer          = _svc("StarterPlayer"),
-        SoundService           = _svc("SoundService"),
-        CollectionService      = _svc("CollectionService"),
-        PathfindingService     = _svc("PathfindingService"),
-        ContextActionService   = _svc("ContextActionService"),
-        MarketplaceService     = _svc("MarketplaceService"),
-        LocalizationService    = _svc("LocalizationService"),
-        TextService            = _svc("TextService"),
-        GuiService             = _svc("GuiService"),
-        VirtualInputManager    = _svc("VirtualInputManager"),
-        VirtualUser            = _svc("VirtualUser"),
-        PhysicsService         = _svc("PhysicsService"),
-        BadgeService           = _svc("BadgeService"),
-        InsertService          = _svc("InsertService"),
-        GroupService           = _svc("GroupService"),
-        TeleportService        = _svc("TeleportService"),
-        Chat                   = _svc("Chat"),
-        CoreGui                = _svc("CoreGui"),
-        ProximityPromptService = _svc("ProximityPromptService"),
-        -- LocalPlayer
-        LocalPlayer = _lp,
-        PlayerGui   = _lp and _lp:WaitForChild("PlayerGui") or nil,
-        Backpack    = _lp and _lp:WaitForChild("Backpack") or nil,
-        Character   = _lp and _lp.Character or nil,
-        Camera      = workspace.CurrentCamera,
-        -- Helpers
-        FireRemote = function(path, ...)
-            local obj = game
-            for part in path:gmatch("[^%.]+") do obj = obj:WaitForChild(part) end
-            if obj and obj.FireServer then obj:FireServer(...) end
-        end,
-        InvokeRemote = function(path, ...)
-            local obj = game
-            for part in path:gmatch("[^%.]+") do obj = obj:WaitForChild(part) end
-            if obj and obj.InvokeServer then return obj:InvokeServer(...) end
-        end,
-        GetRemote = function(path)
-            local obj = game
-            for part in path:gmatch("[^%.]+") do obj = obj:WaitForChild(part) end
-            return obj
-        end,
-        Tween = function(obj, t, props)
-            game:GetService("TweenService"):Create(obj, TweenInfo.new(t or 0.3), props):Play()
-        end,
-        NewGui = function(class, parent, props)
-            local obj = Instance.new(class)
-            if props then for k,v in pairs(props) do obj[k]=v end end
-            obj.Parent = parent
-            return obj
-        end,
-        -- Exploit globals (nil-safe)
-        writefile=_safe("writefile"), readfile=_safe("readfile"),
-        isfile=_safe("isfile"), isfolder=_safe("isfolder"),
-        makefolder=_safe("makefolder"), delfolder=_safe("delfolder"),
-        delfile=_safe("delfile"), listfiles=_safe("listfiles"),
-        appendfile=_safe("appendfile"),
-        setclipboard=_safe("setclipboard"),
-        toclipboard=_safe("toclipboard"),
-        firetouchinterest=_safe("firetouchinterest"),
-        fireclickdetector=_safe("fireclickdetector"),
-        fireproximityprompt=_safe("fireproximityprompt"),
-        firetouchtransmitter=_safe("firetouchtransmitter"),
-        request=_safe("request"),
-        syn=_safe("syn"), http=_safe("http"), fluxus=_safe("fluxus"),
-        HttpGet=_safe("HttpGet"), HttpPost=_safe("HttpPost"),
-        getgenv=_safe("getgenv"), getrenv=_safe("getrenv"),
-        getrawmetatable=_safe("getrawmetatable"),
-        setrawmetatable=_safe("setrawmetatable"),
-        hookfunction=_safe("hookfunction"),
-        hookmetamethod=_safe("hookmetamethod"),
-        newcclosure=_safe("newcclosure"),
-        checkcaller=_safe("checkcaller"),
-        islclosure=_safe("islclosure"),
-        getgc=_safe("getgc"),
-        getsenv=_safe("getsenv"),
-        getscripts=_safe("getscripts"),
-        getloadedmodules=_safe("getloadedmodules"),
-        decompile=_safe("decompile"),
-        getconnections=_safe("getconnections"),
-        firesignal=_safe("firesignal"),
-        Drawing=_safe("Drawing"),
-        cleardrawcache=_safe("cleardrawcache"),
-        identifyexecutor=_safe("identifyexecutor"),
-        getexecutorname=_safe("getexecutorname"),
-        messagebox=_safe("messagebox"),
-        queue_on_teleport=_safe("queue_on_teleport"),
-        setfflag=_safe("setfflag"),
-    }, {__index = _G})
-
-    local fn, err = loadstring(code)
-    if not fn then warn("[Brain] Compile: "..tostring(err)) return end
-    setfenv(fn, env)
-    local ok, e = pcall(fn)
-    if not ok then warn("[Brain] Runtime: "..tostring(e)) end
-end
-
-local function _LOAD(token_table, num_table, chunks)
-    _T = token_table
-    _N = num_table or {}
-    for i = 1, #chunks do
-        local ok, e = pcall(_RUN, chunks[i])
-        if not ok then warn("[Brain] chunk "..i..": "..tostring(e)) end
-    end
-end
-
 return _LOAD
